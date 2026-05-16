@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>الأشرطة الضائعة | مدبلج</title>
+    <link rel="icon" type="image/jpeg" href="5807399279092943537_99.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold:    #ffb347;
+            --gold2:   #ffd166;
+            --red:     #ff6b6b;
+            --red2:    #ff4444;
+            --dark:    #0a0814;
+            --card-bg: rgba(10, 6, 30, 0.75);
+            --border:  rgba(255, 179, 71, 0.35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Cairo', Tahoma, sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            color: #eee;
+            padding: 24px 16px 40px;
+            overflow-x: hidden;
+        }
+
+        /* طبقة الصورة */
+        body::before {
+            content: "";
+            position: fixed; inset: 0;
+            background: url('5807399279092943537_99.jpg') center/cover no-repeat;
+            opacity: .08;
+            z-index: -3;
+        }
+
+        /* gradient mesh */
+        body::after {
+            content: "";
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(255,100,60,.18) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 80%, rgba(80,40,180,.25) 0%, transparent 60%),
+                rgba(0,0,0,.55);
+            z-index: -2;
+        }
+
+        /* نجوم */
+        .stars {
+            position: fixed; inset: 0; z-index: -1;
+            pointer-events: none; overflow: hidden;
+        }
+        .stars span {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: twinkle var(--dur, 3s) infinite ease-in-out;
+            opacity: 0;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0; transform: scale(1); }
+            50%      { opacity: .8; transform: scale(1.6); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 28px;
+            padding: 28px 24px 24px;
+            border: 1px solid var(--border);
+            box-shadow:
+                0 0 0 1px rgba(255,179,71,.08),
+                0 30px 60px rgba(0,0,0,.6),
+                inset 0 1px 0 rgba(255,255,255,.06);
+            animation: fadeUp .7s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* عنوان */
+        .page-title {
+            text-align: center;
+            margin-bottom: 22px;
+            animation: fadeUp .7s .1s ease both;
+        }
+        .page-title h1 {
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--gold), var(--red), var(--gold2));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            line-height: 1.3;
+        }
+        .page-title p {
+            font-size: .8rem;
+            color: rgba(255,255,255,.4);
+            margin-top: 4px;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* wrapper كامل للشريط + المشغل */
+        .player-outer {
+            margin-bottom: 22px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+            box-shadow:
+                0 0 0 4px rgba(255,179,71,.12),
+                0 12px 40px rgba(0,0,0,.6);
+            animation: fadeUp .7s .2s ease both;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* شريط الشعار العلوي */
+        .logo-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(90deg, rgba(0,0,0,.7), rgba(20,10,50,.8));
+            border-bottom: 2px solid var(--gold);
+            padding: 10px 18px;
+            border-radius: 18px 18px 0 0;
+        }
+        .logo-bar img {
+            width: 54px;
+            height: 54px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 10px rgba(255,179,71,.4);
+            flex-shrink: 0;
+        }
+        .logo-bar-text { flex: 1; }
+        .logo-bar-text strong {
+            display: block;
+            font-size: 1rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--gold), var(--gold2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .logo-bar-text span {
+            font-size: .72rem;
+            color: rgba(255,255,255,.4);
+        }
+        .logo-bar-badge {
+            background: linear-gradient(135deg, var(--red), #ff4444);
+            color: white;
+            font-size: .7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(255,68,68,.4);
+            white-space: nowrap;
+        }
+
+        /* شريط الحلقة الحالية */
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, rgba(255,107,107,.15), rgba(255,179,71,.1));
+            border: 1px solid rgba(255,179,71,.3);
+            border-radius: 50px;
+            padding: 8px 18px;
+            margin-bottom: 18px;
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--gold);
+            width: fit-content;
+            margin-inline: auto;
+            animation: fadeUp .7s .3s ease both;
+        }
+        .now-playing .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--red2);
+            box-shadow: 0 0 6px var(--red2);
+            animation: blink 1.2s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; }
+            50%      { opacity: .2; }
+        }
+
+        /* أزرار الحلقات */
+        .episodes-label {
+            text-align: center;
+            font-size: .72rem;
+            color: rgba(255,255,255,.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            animation: fadeUp .7s .35s ease both;
+        }
+
+        .episodes-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            animation: fadeUp .7s .4s ease both;
+        }
+
+        .ep-btn {
+            position: relative;
+            background: linear-gradient(135deg, #ff6b6b, #ffb347);
+            border: none;
+            padding: 11px 20px;
+            border-radius: 50px;
+            font-size: .9rem;
+            font-weight: 700;
+            color: #1a1128;
+            cursor: pointer;
+            transition: transform .25s, box-shadow .25s;
+            font-family: inherit;
+            box-shadow: 0 5px 18px rgba(255,107,107,.35);
+            overflow: hidden;
+        }
+        .ep-btn::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.25), transparent);
+            opacity: 0;
+            transition: opacity .25s;
+        }
+        .ep-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 10px 28px rgba(255,107,107,.5); }
+        .ep-btn:hover::before { opacity: 1; }
+        .ep-btn.active {
+            outline: 2px solid white;
+            outline-offset: 3px;
+            box-shadow: 0 6px 22px rgba(255,179,71,.6);
+        }
+
+        .ep-btn-disabled {
+            background: rgba(255,255,255,.07);
+            color: rgba(255,255,255,.3);
+            border: 1px solid rgba(255,255,255,.1);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .ep-btn-disabled:hover { transform: none; box-shadow: none; }
+        .ep-btn-disabled::before { display: none; }
+
+        /* فاصل */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 0 0 18px;
+        }
+
+        /* تذييل */
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,.3);
+            font-size: .75rem;
+            letter-spacing: .5px;
+            animation: fadeUp .7s .5s ease both;
+        }
+        footer span { color: var(--gold); opacity: .7; }
+
+        /* ===== أزرار التواصل العائمة (مكدسة - تصميم جديد) ===== */
+        .floating-stack {
+            position: fixed;
+            left: 16px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 9999;
+        }
+
+        .floating-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            animation: floatBounce 2.6s ease-in-out infinite;
+        }
+
+        .floating-item:nth-child(2) {
+            animation-delay: .4s;
+        }
+
+        @keyframes floatBounce {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-6px); }
+        }
+
+        /* الدائرة الخارجية النابضة */
+        .float-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .float-ring::before {
+            content: "";
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            animation: pulseRing 2s ease-out infinite;
+        }
+
+        .tg-ring { background: rgba(41,182,246,.2); }
+        .tg-ring::before { background: rgba(41,182,246,.4); }
+        .yt-ring { background: rgba(255,0,0,.2); }
+        .yt-ring::before { background: rgba(255,0,0,.4); }
+
+        @keyframes pulseRing {
+            0%   { transform: scale(1);    opacity: .9; }
+            70%  { transform: scale(1.4);  opacity: 0; }
+            100% { transform: scale(1.4);  opacity: 0; }
+        }
+
+        /* الصورة الدائرية */
+        .float-img {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid rgba(255,255,255,.35);
+            box-shadow: 0 4px 14px rgba(0,0,0,.5);
+            transition: transform .25s, box-shadow .25s;
+            display: block;
+        }
+
+        .float-ring:hover .float-img {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,.7);
+        }
+
+        /* Label */
+        .float-label {
+            font-size: .62rem;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            letter-spacing: .3px;
+            transition: filter .2s;
+        }
+        .float-label:hover { filter: brightness(1.2); }
+        .tg-label { background: rgba(41,182,246,.2); color: #81d4fa; }
+        .yt-label { background: rgba(255,0,0,.2);    color: #ff8a80; }
+
+        /* زر الإغلاق */
+        .float-close-btn {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.75);
+            color: #ccc;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,.15);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1;
+            transition: background .2s, transform .2s;
+            z-index: 10;
+        }
+        .float-close-btn:hover {
+            background: #222;
+            color: white;
+            transform: scale(1.15);
+        }
+
+        /* ===== Responsive عام ===== */
+        @media (max-width: 900px) {
+            .container { padding: 20px 16px; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 14px 10px 30px; }
+            .container { padding: 16px 12px; border-radius: 20px; }
+            .page-title h1 { font-size: 1.2rem; }
+            .logo-bar { padding: 8px 12px; gap: 10px; }
+            .logo-bar img { width: 42px; height: 42px; }
+            .logo-bar-text strong { font-size: .85rem; }
+            .logo-bar-text span { display: none; }
+            .ep-btn { padding: 9px 14px; font-size: .82rem; }
+            .now-playing { font-size: .78rem; padding: 6px 14px; }
+            .floating-stack { left: 10px; bottom: 18px; gap: 14px; }
+            .float-ring { width: 62px; height: 62px; }
+            .float-img { width: 46px; height: 46px; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px 8px 24px; }
+            .container { padding: 12px 10px; border-radius: 16px; }
+            .page-title h1 { font-size: 1rem; }
+            .logo-bar { padding: 7px 10px; gap: 8px; }
+            .logo-bar img { width: 36px; height: 36px; border-radius: 8px; }
+            .logo-bar-badge { font-size: .62rem; padding: 3px 8px; }
+            .episodes-buttons { gap: 8px; }
+            .ep-btn { padding: 8px 11px; font-size: .75rem; }
+            .floating-stack { left: 6px; bottom: 14px; gap: 12px; }
+            .float-ring { width: 54px; height: 54px; }
+            .float-img { width: 40px; height: 40px; }
+            .float-label { font-size: .56rem; padding: 2px 7px; }
+        }
+        @media (max-width: 360px) {
+            .page-title h1 { font-size: .9rem; }
+            .ep-btn { padding: 7px 9px; font-size: .7rem; }
+            .float-ring { width: 48px; height: 48px; }
+            .float-img { width: 36px; height: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<!-- أزرار التواصل العائمة (مكدسة يسار) -->
+<div class="floating-stack" id="floating-stack">
+
+    <!-- تلغرام -->
+    <div id="float-telegram" class="floating-item">
+        <a href="https://t.me/gumball_Season8" target="_blank" class="float-ring tg-ring" title="انضم على تلغرام">
+            <img src="images.png" alt="تلغرام" class="float-img">
+        </a>
+        <span class="float-label tg-label" onclick="window.open('https://t.me/gumball_Season8','_blank')">تلغرام</span>
+        <button class="float-close-btn" data-target="float-telegram" data-key="hide_tg">×</button>
+    </div>
+
+    <!-- يوتيوب -->
+    <div id="float-youtube" class="floating-item">
+        <a href="https://www.youtube.com/@cartonkandy" target="_blank" class="float-ring yt-ring" title="قناة يوتيوب">
+            <img src="channels4_profile.jpg" alt="يوتيوب" class="float-img">
+        </a>
+        <span class="float-label yt-label" onclick="window.open('https://www.youtube.com/@cartonkandy','_blank')">يوتيوب</span>
+        <button class="float-close-btn" data-target="float-youtube" data-key="hide_yt">×</button>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="page-title">
+        <h1>الأشرطة الضائعة — مدبلج</h1>
+        <p>شاهد الحلقات بجودة عالية وبالعربية</p>
+    </div>
+
+    <div class="player-outer">
+        <!-- شريط الشعار فوق المشغل -->
+        <div class="logo-bar">
+            <img src="5807399279092943537_99.jpg" alt="شعار المسلسل">
+            <div class="logo-bar-text">
+                <strong>الأشرطة الضائعة</strong>
+                <span>يسطا قدرني وتابعني علي يوتيوب وتليجرام </span>
+            </div>
+            <span class="logo-bar-badge">🎙️ مدبلج</span>
+        </div>
+        <!-- مشغل يوتيوب -->
+        <div class="video-wrapper">
+            <iframe
+                id="videoPlayer"
+                src="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8"
+                frameborder="0"
+                allowfullscreen
+                allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            ></iframe>
+        </div>
+    </div>
+
+    <div class="now-playing">
+        <span class="dot"></span>
+        <span id="nowPlayingText">يتم تشغيل: الحلقة 1+2</span>
+    </div>
+
+    <p class="episodes-label">اختر الحلقة</p>
+    <div class="episodes-buttons">
+        <button class="ep-btn active" data-url="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8" data-label="الحلقة 1+2">
+            🎞️ الحلقة 1+2 – مدبلجة
+        </button>
+        <button class="ep-btn" data-url="https://luluvid.com/e/5t66se97obul" data-label="الحلقة 3">🎞️ الحلقة 3 – مدبلجة</button>
+        <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 4 – قريباً</button>
+        <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 5 – قريباً</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <footer>
+        <span>⚡</span> جميع الحلقات مدبلجة حصرياً &nbsp;|&nbsp; شاهد بأمان وجودة عالية <span>⚡</span>
+    </footer>
+
+</div>
+
+<script>
+    // ── نجوم ──
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+        const s = document.createElement('span');
+        const size = 1 + Math.random() * 2;
+        s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;width:${size}px;height:${size}px;`;
+        starsEl.appendChild(s);
+    }
+
+    // ── أزرار الحلقات ──
+    const player     = document.getElementById('videoPlayer');
+    const nowText    = document.getElementById('nowPlayingText');
+    const activeBtns = document.querySelectorAll('.ep-btn:not(.ep-btn-disabled)');
+
+    activeBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const url   = this.dataset.url;
+            const label = this.dataset.label;
+            if (!url) return;
+            player.src = url;
+            nowText.textContent = 'يتم تشغيل: ' + label;
+            activeBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+
+    // ── أزرار الإغلاق العائمة ──
+    document.querySelectorAll('.float-close-btn').forEach(btn => {
+        const targetId   = btn.dataset.target;
+        const storageKey = btn.dataset.key;
+        const container  = document.getElementById(targetId);
+
+        // إخفاء لو مغلق خلال ساعة
+        const saved = localStorage.getItem(storageKey);
+        if (saved && Date.now() - parseInt(saved) < 3600000) {
+            if (container) container.style.display = 'none';
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (container) container.style.display = 'none';
+            localStorage.setItem(storageKey, Date.now().toString());
+        });
+    });
+</script>
+
+</body>
+</html>
