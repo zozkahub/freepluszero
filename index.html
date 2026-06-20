@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>الأشرطة الضائعة | مدبلج</title>
+    <title>مكتبتي | مدبلج</title>
     <link rel="icon" type="image/jpeg" href="5807399279092943537_99.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
@@ -17,6 +16,8 @@
             --dark:    #0a0814;
             --card-bg: rgba(10, 6, 30, 0.75);
             --border:  rgba(255, 179, 71, 0.35);
+            --circus-pink:   #ff3da6;
+            --circus-purple: #8a2be2;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,24 +31,44 @@
             overflow-x: hidden;
         }
 
-        /* طبقة الصورة */
+        /* ===== خلفية الجسم: حالة افتراضية = الصفحة الرئيسية ===== */
         body::before {
             content: "";
             position: fixed; inset: 0;
-            background: url('5807399279092943537_99.jpg') center/cover no-repeat;
-            opacity: .08;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(255,179,71,.10) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 85% 90%, rgba(255,68,68,.12) 0%, transparent 60%);
             z-index: -3;
         }
-
-        /* gradient mesh */
         body::after {
             content: "";
             position: fixed; inset: 0;
+            background: rgba(0,0,0,.5);
+            z-index: -2;
+        }
+
+        /* خلفية صفحة "الأشرطة الضائعة" -- نفس خلفية الملف الأصلي بالحرف، بدون أي تغيير في الشكل */
+        body.bg-regular::before {
+            background: url('5807399279092943537_99.jpg') center/cover no-repeat;
+            opacity: .08;
+        }
+        body.bg-regular::after {
             background:
                 radial-gradient(ellipse 80% 60% at 10% 20%, rgba(255,100,60,.18) 0%, transparent 60%),
                 radial-gradient(ellipse 70% 50% at 90% 80%, rgba(80,40,180,.25) 0%, transparent 60%),
                 rgba(0,0,0,.55);
-            z-index: -2;
+        }
+
+        /* خلفية صفحة "السيرك الرقمي المذهل" */
+        body.bg-circus::before {
+            background: url('The-Amazing-Digital-Circus_The-Last-Act-kv.jpg') center/cover no-repeat;
+            opacity: .10;
+        }
+        body.bg-circus::after {
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 15%, rgba(255,61,166,.20) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 55% at 85% 85%, rgba(138,43,226,.22) 0%, transparent 60%),
+                rgba(0,0,0,.55);
         }
 
         /* نجوم */
@@ -66,6 +87,34 @@
             0%,100% { opacity: 0; transform: scale(1); }
             50%      { opacity: .8; transform: scale(1.6); }
         }
+
+        /* ===== تبديل الصفحات (Home / Regular / Circus) ===== */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* زر العودة للرئيسية */
+        .home-fab {
+            position: fixed; top: 16px; right: 16px;
+            width: 46px; height: 46px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--red));
+            border: none; color: #1a1128; font-size: 1.2rem;
+            display: none; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45);
+            z-index: 10000; transition: transform .2s;
+        }
+        .home-fab:hover { transform: scale(1.08); }
+
+        /* نص متدرّج قابل لإعادة الاستخدام (نفس تدرّج عنوان الصفحة الأصلي) */
+        .grad-text {
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--gold), var(--red), var(--gold2));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer { to { background-position: 200% center; } }
 
         /* Container */
         .container {
@@ -109,9 +158,6 @@
             font-size: .8rem;
             color: rgba(255,255,255,.4);
             margin-top: 4px;
-        }
-        @keyframes shimmer {
-            to { background-position: 200% center; }
         }
 
         /* wrapper كامل للشريط + المشغل */
@@ -291,7 +337,7 @@
         }
         footer span { color: var(--gold); opacity: .7; }
 
-        /* ===== أزرار التواصل العائمة (مكدسة - تصميم جديد) ===== */
+        /* ===== أزرار التواصل العائمة (مكدسة) ===== */
         .floating-stack {
             position: fixed;
             left: 16px;
@@ -320,7 +366,6 @@
             50%      { transform: translateY(-6px); }
         }
 
-        /* الدائرة الخارجية النابضة */
         .float-ring {
             width: 72px;
             height: 72px;
@@ -332,14 +377,12 @@
             position: relative;
             text-decoration: none;
         }
-
         .float-ring::before {
             content: "";
             position: absolute; inset: 0;
             border-radius: 50%;
             animation: pulseRing 2s ease-out infinite;
         }
-
         .tg-ring { background: rgba(41,182,246,.2); }
         .tg-ring::before { background: rgba(41,182,246,.4); }
         .yt-ring { background: rgba(255,0,0,.2); }
@@ -351,7 +394,6 @@
             100% { transform: scale(1.4);  opacity: 0; }
         }
 
-        /* الصورة الدائرية */
         .float-img {
             width: 54px;
             height: 54px;
@@ -362,13 +404,11 @@
             transition: transform .25s, box-shadow .25s;
             display: block;
         }
-
         .float-ring:hover .float-img {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,.7);
         }
 
-        /* Label */
         .float-label {
             font-size: .62rem;
             font-weight: 700;
@@ -383,7 +423,6 @@
         .tg-label { background: rgba(41,182,246,.2); color: #81d4fa; }
         .yt-label { background: rgba(255,0,0,.2);    color: #ff8a80; }
 
-        /* زر الإغلاق */
         .float-close-btn {
             position: absolute;
             top: -4px;
@@ -407,7 +446,117 @@
             transform: scale(1.15);
         }
 
-        /* ===== Responsive عام ===== */
+        /* ============================================================
+           الصفحة الرئيسية الجديدة (ستايل نتفليكس)
+           ============================================================ */
+        .home-wrap { max-width: 1100px; margin: 0 auto; }
+
+        .home-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            animation: fadeUp .7s ease both;
+        }
+        .home-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .hero {
+            position: relative;
+            min-height: 300px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,.55);
+            display: flex; align-items: flex-end;
+            padding: 28px;
+            margin-bottom: 30px;
+            background-image: linear-gradient(180deg, rgba(10,8,20,0) 0%, rgba(10,8,20,.55) 55%, var(--dark) 100%), var(--hero-img);
+            background-size: cover;
+            background-position: center;
+            animation: fadeUp .7s .1s ease both;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 540px; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,179,71,.15);
+            border: 1px solid var(--gold);
+            color: var(--gold2);
+            font-size: .75rem; font-weight: 700;
+            padding: 5px 14px; border-radius: 30px;
+            margin-bottom: 12px;
+        }
+        .hero h1 {
+            font-size: clamp(1.4rem, 4.5vw, 2.3rem);
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+        .hero p {
+            font-size: .9rem;
+            color: rgba(255,255,255,.75);
+            margin-bottom: 18px;
+        }
+        .hero-play {
+            font-size: 1rem;
+            padding: 12px 28px;
+        }
+
+        .home-row { margin-bottom: 18px; }
+        .row-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--gold2);
+            margin: 0 2px 14px;
+            animation: fadeUp .7s .15s ease both;
+        }
+        .shows-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            animation: fadeUp .7s .2s ease both;
+        }
+        .show-card {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background-image: var(--card-img);
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 10px 26px rgba(0,0,0,.45);
+            transition: transform .3s, box-shadow .3s, border-color .3s;
+        }
+        .show-card::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,.88) 100%);
+        }
+        .show-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            border-color: var(--gold);
+            box-shadow: 0 18px 40px rgba(0,0,0,.6);
+        }
+        .show-card-info {
+            position: absolute; right: 0; left: 0; bottom: 0;
+            z-index: 2;
+            padding: 14px 16px;
+        }
+        .show-card-info h3 {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 2px 6px rgba(0,0,0,.6);
+            margin-bottom: 8px;
+        }
+
+        .home-footer { margin-top: 6px; }
+
+        /* ===== Responsive ===== */
         @media (max-width: 900px) {
             .container { padding: 20px 16px; }
         }
@@ -424,6 +573,10 @@
             .floating-stack { left: 10px; bottom: 18px; gap: 14px; }
             .float-ring { width: 62px; height: 62px; }
             .float-img { width: 46px; height: 46px; }
+            .hero { min-height: 240px; padding: 20px; }
+            .hero h1 { font-size: 1.3rem; }
+            .hero p { font-size: .82rem; }
+            .shows-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
         }
         @media (max-width: 480px) {
             body { padding: 10px 8px 24px; }
@@ -438,6 +591,7 @@
             .float-ring { width: 54px; height: 54px; }
             .float-img { width: 40px; height: 40px; }
             .float-label { font-size: .56rem; padding: 2px 7px; }
+            .home-fab { width: 40px; height: 40px; top: 10px; right: 10px; }
         }
         @media (max-width: 360px) {
             .page-title h1 { font-size: .9rem; }
@@ -449,130 +603,289 @@
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<!-- زر العودة للرئيسية (يظهر فقط داخل صفحات العروض) -->
+<button id="global-home-btn" class="home-fab" onclick="showView('home')" title="الرئيسية">🏠</button>
 
-<!-- أزرار التواصل العائمة (مكدسة يسار) -->
-<div class="floating-stack" id="floating-stack">
+<!-- ======================================================================
+     1) الصفحة الرئيسية (ستايل نتفليكس)
+     ====================================================================== -->
+<div id="view-home" class="view active">
+    <div class="home-wrap">
 
-    <!-- تلغرام -->
-    <div id="float-telegram" class="floating-item">
-        <a href="https://t.me/gumball_Season8" target="_blank" class="float-ring tg-ring" title="انضم على تلغرام">
-            <img src="images.png" alt="تلغرام" class="float-img">
-        </a>
-        <span class="float-label tg-label" onclick="window.open('https://t.me/gumball_Season8','_blank')">تلغرام</span>
-        <button class="float-close-btn" data-target="float-telegram" data-key="hide_tg">×</button>
+        <header class="home-top">
+            <div class="home-brand"><span class="grad-text">🎬 مكتبتي</span></div>
+        </header>
+
+        <section class="hero" style="--hero-img:url('The-Amazing-Digital-Circus_The-Last-Act-kv.jpg')">
+            <div class="hero-content">
+                <span class="hero-badge">✨ أُضيف حديثاً</span>
+                <h1 class="grad-text">السيرك الرقمي المذهل</h1>
+                <p>الموسم الأول كاملاً (9 حلقات) مدبلج بالعربي بالكامل</p>
+                <button class="ep-btn hero-play" onclick="showView('circus')">▶ تشغيل</button>
+            </div>
+        </section>
+
+        <section class="home-row">
+            <h2 class="row-title">المسلسلات</h2>
+            <div class="shows-grid">
+
+                <div class="show-card" style="--card-img:url('ggreg.jpg')" onclick="showView('regular')">
+                    <div class="show-card-info">
+                        <h3>الأشرطة الضائعة</h3>
+                        <span class="logo-bar-badge">🎙️ مدبلج</span>
+                    </div>
+                </div>
+
+                <div class="show-card" style="--card-img:url('The-Amazing-Digital-Circus_The-Last-Act-kv.jpg')" onclick="showView('circus')">
+                    <div class="show-card-info">
+                        <h3>السيرك الرقمي المذهل</h3>
+                        <span class="logo-bar-badge">🎪 الموسم 1 • مدبلج</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="home-footer">
+            <span>⚡</span> جميع الحلقات مدبلجة حصرياً &nbsp;|&nbsp; شاهد بأمان وجودة عالية <span>⚡</span>
+        </footer>
+
     </div>
-
-    <!-- يوتيوب -->
-    <div id="float-youtube" class="floating-item">
-        <a href="https://www.youtube.com/@cartonkandy" target="_blank" class="float-ring yt-ring" title="قناة يوتيوب">
-            <img src="channels4_profile.jpg" alt="يوتيوب" class="float-img">
-        </a>
-        <span class="float-label yt-label" onclick="window.open('https://www.youtube.com/@cartonkandy','_blank')">يوتيوب</span>
-        <button class="float-close-btn" data-target="float-youtube" data-key="hide_yt">×</button>
-    </div>
-
 </div>
 
-<div class="container">
+<!-- ======================================================================
+     2) صفحة "الأشرطة الضائعة" -- العرض العادي، طبق الأصل بدون أي تغيير
+     ====================================================================== -->
+<div id="view-regular" class="view">
 
-    <div class="page-title">
-        <h1>الأشرطة الضائعة — مدبلج</h1>
-        <p>شاهد الحلقات بجودة عالية وبالعربية</p>
+    <div class="stars" id="stars"></div>
+
+    <div class="floating-stack" id="floating-stack">
+
+        <div id="float-telegram" class="floating-item">
+            <a href="https://t.me/gumball_Season8" target="_blank" class="float-ring tg-ring" title="انضم على تلغرام">
+                <img src="images.png" alt="تلغرام" class="float-img">
+            </a>
+            <span class="float-label tg-label" onclick="window.open('https://t.me/gumball_Season8','_blank')">تلغرام</span>
+            <button class="float-close-btn" data-target="float-telegram" data-key="hide_tg">×</button>
+        </div>
+
+        <div id="float-youtube" class="floating-item">
+            <a href="https://www.youtube.com/@cartonkandy" target="_blank" class="float-ring yt-ring" title="قناة يوتيوب">
+                <img src="channels4_profile.jpg" alt="يوتيوب" class="float-img">
+            </a>
+            <span class="float-label yt-label" onclick="window.open('https://www.youtube.com/@cartonkandy','_blank')">يوتيوب</span>
+            <button class="float-close-btn" data-target="float-youtube" data-key="hide_yt">×</button>
+        </div>
+
     </div>
 
-    <div class="player-outer">
-        <!-- شريط الشعار فوق المشغل -->
-        <div class="logo-bar">
-            <img src="5807399279092943537_99.jpg" alt="شعار المسلسل">
-            <div class="logo-bar-text">
-                <strong>الأشرطة الضائعة</strong>
-                <span>يسطا قدرني وتابعني علي يوتيوب وتليجرام </span>
+    <div class="container">
+
+        <div class="page-title">
+            <h1>الأشرطة الضائعة — مدبلج</h1>
+            <p>شاهد الحلقات بجودة عالية وبالعربية</p>
+        </div>
+
+        <div class="player-outer">
+            <div class="logo-bar">
+                <img src="5807399279092943537_99.jpg" alt="شعار المسلسل">
+                <div class="logo-bar-text">
+                    <strong>الأشرطة الضائعة</strong>
+                    <span>يسطا قدرني وتابعني علي يوتيوب وتليجرام </span>
+                </div>
+                <span class="logo-bar-badge">🎙️ مدبلج</span>
             </div>
-            <span class="logo-bar-badge">🎙️ مدبلج</span>
+            <div class="video-wrapper">
+                <iframe
+                    id="videoPlayer"
+                    src="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8"
+                    frameborder="0"
+                    allowfullscreen
+                    allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                ></iframe>
+            </div>
         </div>
-        <!-- مشغل يوتيوب -->
-        <div class="video-wrapper">
-            <iframe
-                id="videoPlayer"
-                src="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8"
-                frameborder="0"
-                allowfullscreen
-                allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            ></iframe>
+
+        <div class="now-playing">
+            <span class="dot"></span>
+            <span id="nowPlayingText">يتم تشغيل: الحلقة 1+2</span>
         </div>
+
+        <p class="episodes-label">اختر الحلقة</p>
+        <div class="episodes-buttons">
+            <button class="ep-btn active" data-url="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8" data-label="الحلقة 1+2">
+                🎞️ الحلقة 1+2 – مدبلجة
+            </button>
+            <button class="ep-btn" data-url="https://luluvid.com/e/5t66se97obul" data-label="الحلقة 3">🎞️ الحلقة 3 – مدبلجة</button>
+            <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 4 – قريباً</button>
+            <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 5 – قريباً</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <footer>
+            <span>⚡</span> جميع الحلقات مدبلجة حصرياً &nbsp;|&nbsp; شاهد بأمان وجودة عالية <span>⚡</span>
+        </footer>
+
+    </div>
+</div>
+
+<!-- ======================================================================
+     3) صفحة "السيرك الرقمي المذهل" -- قسم جديد، الموسم الأول كامل
+     ====================================================================== -->
+<div id="view-circus" class="view">
+
+    <div class="stars" id="c-stars"></div>
+
+    <div class="floating-stack" id="c-floating-stack">
+
+        <div id="c-float-telegram" class="floating-item">
+            <a href="https://t.me/gumball_Season8" target="_blank" class="float-ring tg-ring" title="انضم على تلغرام">
+                <img src="images.png" alt="تلغرام" class="float-img">
+            </a>
+            <span class="float-label tg-label" onclick="window.open('https://t.me/gumball_Season8','_blank')">تلغرام</span>
+            <button class="float-close-btn" data-target="c-float-telegram" data-key="hide_tg_c">×</button>
+        </div>
+
+        <div id="c-float-youtube" class="floating-item">
+            <a href="https://www.youtube.com/@cartonkandy" target="_blank" class="float-ring yt-ring" title="قناة يوتيوب">
+                <img src="channels4_profile.jpg" alt="يوتيوب" class="float-img">
+            </a>
+            <span class="float-label yt-label" onclick="window.open('https://www.youtube.com/@cartonkandy','_blank')">يوتيوب</span>
+            <button class="float-close-btn" data-target="c-float-youtube" data-key="hide_yt_c">×</button>
+        </div>
+
     </div>
 
-    <div class="now-playing">
-        <span class="dot"></span>
-        <span id="nowPlayingText">يتم تشغيل: الحلقة 1+2</span>
+    <div class="container">
+
+        <div class="page-title">
+            <h1>السيرك الرقمي المذهل</h1>
+            <p>الموسم الأول كاملاً — مدبلج بالعربي</p>
+        </div>
+
+        <div class="player-outer">
+            <div class="logo-bar">
+                <img src="The-Amazing-Digital-Circus_The-Last-Act-kv.jpg" alt="شعار السيرك">
+                <div class="logo-bar-text">
+                    <strong>السيرك الرقمي المذهل</strong>
+                    <span>الموسم الأول كامل | تابعنا على يوتيوب وتليجرام</span>
+                </div>
+                <span class="logo-bar-badge">🎪 مدبلج</span>
+            </div>
+            <div class="video-wrapper">
+                <iframe
+                    id="c-videoPlayer"
+                    src="https://www.youtube.com/embed/HwAPLk_sQ3w"
+                    frameborder="0"
+                    allowfullscreen
+                    allow="autoplay; fullscreen; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                ></iframe>
+            </div>
+        </div>
+
+        <div class="now-playing">
+            <span class="dot"></span>
+            <span id="c-nowPlayingText">يتم تشغيل: الحلقة 1</span>
+        </div>
+
+        <p class="episodes-label">اختر الحلقة</p>
+        <div class="episodes-buttons">
+            <button class="ep-btn active" data-url="https://www.youtube.com/embed/HwAPLk_sQ3w" data-label="الحلقة 1">🎞️ الحلقة 1</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/4ofJpOEXrZs" data-label="الحلقة 2">🎞️ الحلقة 2</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/bKjfw77cxeQ" data-label="الحلقة 3">🎞️ الحلقة 3</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/Q9KWcWKo2T8" data-label="الحلقة 4">🎞️ الحلقة 4</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/L4p2gN2CzsA" data-label="الحلقة 5">🎞️ الحلقة 5</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/mOvhHim78YA" data-label="الحلقة 6">🎞️ الحلقة 6</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/oaOG1xOk7XY" data-label="الحلقة 7">🎞️ الحلقة 7</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/DMNlzf8PiEM" data-label="الحلقة 8">🎞️ الحلقة 8</button>
+            <button class="ep-btn" data-url="https://www.youtube.com/embed/PVy-bcTsO8A" data-label="الحلقة 9">🎞️ الحلقة 9</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <footer>
+            <span>🎪</span> جميع حلقات الموسم الأول مدبلجة بالعربي حصرياً &nbsp;|&nbsp; استمتع بالمشاهدة <span>🎪</span>
+        </footer>
+
     </div>
-
-    <p class="episodes-label">اختر الحلقة</p>
-    <div class="episodes-buttons">
-        <button class="ep-btn active" data-url="https://www.youtube.com/embed/JcvOaWtbPiU?si=gjgurq787oXVTDw8" data-label="الحلقة 1+2">
-            🎞️ الحلقة 1+2 – مدبلجة
-        </button>
-        <button class="ep-btn" data-url="https://luluvid.com/e/5t66se97obul" data-label="الحلقة 3">🎞️ الحلقة 3 – مدبلجة</button>
-        <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 4 – قريباً</button>
-        <button class="ep-btn ep-btn-disabled" disabled>⚠️ الحلقة 5 – قريباً</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <footer>
-        <span>⚡</span> جميع الحلقات مدبلجة حصرياً &nbsp;|&nbsp; شاهد بأمان وجودة عالية <span>⚡</span>
-    </footer>
-
 </div>
 
 <script>
-    // ── نجوم ──
-    const starsEl = document.getElementById('stars');
-    for (let i = 0; i < 80; i++) {
-        const s = document.createElement('span');
-        const size = 1 + Math.random() * 2;
-        s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;width:${size}px;height:${size}px;`;
-        starsEl.appendChild(s);
-    }
-
-    // ── أزرار الحلقات ──
-    const player     = document.getElementById('videoPlayer');
-    const nowText    = document.getElementById('nowPlayingText');
-    const activeBtns = document.querySelectorAll('.ep-btn:not(.ep-btn-disabled)');
-
-    activeBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            const url   = this.dataset.url;
-            const label = this.dataset.label;
-            if (!url) return;
-            player.src = url;
-            nowText.textContent = 'يتم تشغيل: ' + label;
-            activeBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    });
-
-    // ── أزرار الإغلاق العائمة ──
-    document.querySelectorAll('.float-close-btn').forEach(btn => {
-        const targetId   = btn.dataset.target;
-        const storageKey = btn.dataset.key;
-        const container  = document.getElementById(targetId);
-
-        // إخفاء لو مغلق خلال ساعة
-        const saved = localStorage.getItem(storageKey);
-        if (saved && Date.now() - parseInt(saved) < 3600000) {
-            if (container) container.style.display = 'none';
+    /* ===== نجوم الخلفية (قابلة لإعادة الاستخدام لأي صفحة) ===== */
+    function initStars(elId, count) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        for (let i = 0; i < (count || 80); i++) {
+            const s = document.createElement('span');
+            const size = 1 + Math.random() * 2;
+            s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;width:${size}px;height:${size}px;`;
+            el.appendChild(s);
         }
+    }
+    initStars('stars');
+    initStars('c-stars');
 
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (container) container.style.display = 'none';
-            localStorage.setItem(storageKey, Date.now().toString());
+    /* ===== أزرار الحلقات (مُعمَّمة، تعمل بشكل مستقل لكل صفحة عرض) ===== */
+    function setupEpisodeButtons(containerId, playerId, textId) {
+        const container = document.getElementById(containerId);
+        const player     = document.getElementById(playerId);
+        const nowText    = document.getElementById(textId);
+        const buttons    = container.querySelectorAll('.ep-btn:not(.ep-btn-disabled)');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const url   = this.dataset.url;
+                const label = this.dataset.label;
+                if (!url) return;
+                player.src = url;
+                nowText.textContent = 'يتم تشغيل: ' + label;
+                buttons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         });
-    });
+    }
+    setupEpisodeButtons('view-regular', 'videoPlayer', 'nowPlayingText');
+    setupEpisodeButtons('view-circus', 'c-videoPlayer', 'c-nowPlayingText');
+
+    /* ===== أزرار إغلاق الفقاعات العائمة (مُعمَّمة) ===== */
+    function setupFloatClose(containerId) {
+        const container = document.getElementById(containerId);
+        container.querySelectorAll('.float-close-btn').forEach(btn => {
+            const targetId   = btn.dataset.target;
+            const storageKey = btn.dataset.key;
+            const target     = document.getElementById(targetId);
+
+            const saved = localStorage.getItem(storageKey);
+            if (saved && Date.now() - parseInt(saved) < 3600000) {
+                if (target) target.style.display = 'none';
+            }
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (target) target.style.display = 'none';
+                localStorage.setItem(storageKey, Date.now().toString());
+            });
+        });
+    }
+    setupFloatClose('view-regular');
+    setupFloatClose('view-circus');
+
+    /* ===== التبديل بين الصفحات ===== */
+    function showView(name) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + name).classList.add('active');
+
+        document.body.classList.remove('bg-regular', 'bg-circus');
+        if (name === 'regular') document.body.classList.add('bg-regular');
+        if (name === 'circus')  document.body.classList.add('bg-circus');
+
+        document.getElementById('global-home-btn').style.display = (name === 'home') ? 'none' : 'flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 </script>
 
 </body>
